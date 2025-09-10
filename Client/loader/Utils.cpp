@@ -559,79 +559,26 @@ static const SString DoUserAssistedSearch() noexcept
 ///////////////////////////////////////////////////////////////
 ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 {
-    // Registry places to look
-    std::vector<SString> pathList;
+    SString strPortablePath = PathJoin(GetMTASAPath(), "bin");
 
-    // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
-    pathList.push_back(GetCommonRegistryValue("", "GTA:SA Path"));
-
-    // Unicode character check on first one
-    if (strlen(pathList[0].c_str()))
+    if (FileExists(PathJoin(strPortablePath, MTA_GTA_KNOWN_FILE_NAME)))
     {
-        // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-        if (strchr(pathList[0].c_str(), '?') != nullptr)
-            return GAME_PATH_UNICODE_CHARS;
+        strOutResult = strPortablePath;
+        return GAME_PATH_OK;
     }
 
-    // Then step through looking for a known existing file
-    for (uint i = 0; i < pathList.size(); i++)
-    {
-        if (pathList[i].empty())
-            continue;
-
-        if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
-        {
-            strOutResult = pathList[i];
-            // Update registry.
-            SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
-            return GAME_PATH_OK;
-        }
-    }
-
-    // Try to find?
     if (!bFindIfMissing)
         return GAME_PATH_MISSING;
 
-    // Ask user to browse for GTA
-    BROWSEINFOW bi = {0};
-    WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
-    bi.lpszTitle = strMessage;
-    LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
+    SString strMessage = SString(
+        "This portable MTA build requires GTA San Andreas in the 'bin' folder.\n\n"
+        "Expected location:\n%s\n\n"
+        "Please copy your complete GTA San Andreas installation to this location.",
+        *strPortablePath);
 
-    if (pidl != 0)
-    {
-        wchar_t szBuffer[MAX_PATH];
-        // get the name of the  folder
-        if (SHGetPathFromIDListW(pidl, szBuffer))
-        {
-            strOutResult = ToUTF8(szBuffer);
-        }
+    MessageBox(NULL, strMessage, "Setup Required", MB_OK | MB_ICONINFORMATION);
 
-        // free memory used
-        IMalloc* imalloc = 0;
-        if (SUCCEEDED(SHGetMalloc(&imalloc)))
-        {
-            imalloc->Free(pidl);
-            imalloc->Release();
-        }
-    }
-
-    // Check browse result
-    if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
-    {
-        // If browse didn't help, try another method
-        strOutResult = DoUserAssistedSearch();
-
-        if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
-        {
-            // If still not found, give up
-            return GAME_PATH_MISSING;
-        }
-    }
-
-    // File found. Update registry.
-    SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
-    return GAME_PATH_OK;
+    return GAME_PATH_MISSING;
 }
 
 ///////////////////////////////////////////////////////////////

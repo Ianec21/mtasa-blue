@@ -1094,7 +1094,7 @@ void CheckDataFiles()
 
     // Check for conflicting files
     static const char* dllConflicts[] = {
-        "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthread.dll"
+        "xmll.dll", "cgui.dll", "netc.dll", "pthread.dll"
     };
 
     for (uint i = 0; i < NUMELMS(dllConflicts); ++i)
@@ -1173,7 +1173,7 @@ void CheckDataFiles()
     }
 
     // Check for ASI files
-    std::vector<SString> gtaAsiFiles = FindFiles(PathJoin(strGTAPath, "*.asi"), true, false);
+    /*std::vector<SString> gtaAsiFiles = FindFiles(PathJoin(strGTAPath, "*.asi"), true, false);
     std::vector<SString> mtaAsiFiles = FindFiles(PathJoin(strMTASAPath, "mta", "*.asi"), true, false);
 
     const size_t MAX_ASI_FILES = 100;
@@ -1193,7 +1193,7 @@ void CheckDataFiles()
         DisplayErrorMessageBox(_(".asi files are in the installation directory.\n\n"
                                 "Remove these .asi files if you experience problems."),
                               _E("CL28"), "asi-files");
-    }
+    }*/
 
     // Check for graphics libraries in the GTA/MTA install directory
     {
