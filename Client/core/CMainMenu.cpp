@@ -98,7 +98,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
         float iRatioSizeX = ScreenSize.fX / NATIVE_RES_X;
         iBackgroundSizeX = ScreenSize.fX;
-        iBackgroundSizeY = NATIVE_BG_Y * iRatioSizeX;
+        iBackgroundSizeY = ScreenSize.fY;
     }
     else            // Otherwise our monitor is in a portrait resolution, so we cant fill the background by y
     {
